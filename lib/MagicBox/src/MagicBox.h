@@ -12,6 +12,10 @@ private:
   Magic magic=Magic();
   bool haveNewPush=false;
 public:
+    MagicBox(CRGB *led,Keypad *kpd)
+    :Box(led,kpd){
+    }
+
     virtual void setup(){
       standByFlag=false;
       // position=getPosition(0,4);
