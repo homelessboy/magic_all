@@ -54,6 +54,8 @@ private:
 
   unsigned long startActionTime=0;//开始执行操作时间；
 
+  void(* resetFunc) (void) = 0;
+
 protected:
   void rotationP(P *ps,bool cw,int size,int step){
     while(step-- > 0){
@@ -261,7 +263,14 @@ protected:
   }
 
   void resetAll(){
-
+    if(startActionTime=0){
+      startActionTime=millis();
+      setOK();
+    }
+    if(millis()-startActionTime>OKTime){
+      rom.setNewone();
+      resetFunc();
+    }
   }
 
   void showDefault(){
@@ -276,7 +285,7 @@ public:
     actionIndex=0;
   }
   void setup(){
-    rom.setNewone();
+    // rom.setNewone();
     if(rom.isNewone()){
       cells=new byte[54];
       for(int i=0;i<6;i++){
