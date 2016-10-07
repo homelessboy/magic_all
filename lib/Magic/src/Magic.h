@@ -4,6 +4,7 @@
 #include "MagicAction.h"
 #include "FastLED.h"
 #include "P.h"
+#include "EEPROMOperator.h"
 
 static byte CIRCLE_INDEX=0;
 static byte SURFACE_INDEX=1;
@@ -12,10 +13,12 @@ static byte MIDDLE_INDEX=2;
 class Magic{
 private:
   CRGB *led;
+  EEPROMOperator rom=EEPROMOperator();
+
   MagicAction actions[100];
   byte actionIndex;
   unsigned long lastUpdate;
-  byte cells[54];
+  byte *cells;
   CRGB color[6]={
     CRGB(0,0,10),CRGB(0,10,0),CRGB(0,10,10),
     CRGB(10,0,0),CRGB(10,0,10),CRGB(10,10,0)};
@@ -29,7 +32,7 @@ private:
     CRGB(0,0,0),CRGB(0,0,0),CRGB(0,0,0),CRGB(0,0,0)
   };
 
-  byte maskRound=2;
+  byte maskRound=1;
   byte circlePS=3,middlePS=3,surfacePS=2;
   byte PS[3]={3,2,3};//依次为circle；surface；middle
   byte step[3]={0,0,0};
@@ -39,8 +42,11 @@ private:
   byte circleStep,middleStep,surfaceStep,operatSide;
   bool cw;
 
-  unsigned long timeP=500;//每次转动的时间
+  unsigned long timePRotation=500;//每次转动的时间
+  unsigned long timePRandom=200;
   unsigned long standbyTime=30000;//进入待机状态的时间
+  unsigned long OKTime=1000;//操作完成后动作
+  unsigned long showFaceTime=2000;
 
   unsigned long startActionTime=0;//开始执行操作时间；
 
@@ -76,10 +82,15 @@ protected:
     return maski;
   }
 
+  void setOK(){
+    for(int i=0;i<54;i++){
+      led[i]=color[1];
+    }
+  }
+
   void rotation(){
     if(startActionTime==0){
       startActionTime=millis();
-      Serial.println("rotation");
       for(int i=0;i<3;i++){
         step[i]=PS[i];
       }
@@ -92,6 +103,7 @@ protected:
       cw=actions[0].action.cw;
       operatSide=actions[0].action.surface;
     }
+    unsigned long timeP=actions[0].code==ROTATION_CODE?timePRotation:timePRandom;
 
     unsigned long nowTime=millis();
     if(startActionTime!=0){
@@ -144,7 +156,21 @@ protected:
   }
 
   void showFace(){
-
+    if(startActionTime==0){
+      startActionTime=millis();
+      for(int i=0;i<54;i++)
+        led[i]=CRGB(0,0,0);
+      for(int i=0;i<9;i++){
+        led[actions[0].arg2*9+i]=color[0];
+      }
+      for(int i=0;i<4;i++){
+        led[actions[0].arg1*9+i*2+1]=color[0];
+      }
+      led[actions[0].arg1*9+4]=color[0];
+    }
+    if(millis()-startActionTime>showFaceTime){
+      actionEnd();
+    }
   }
 
   void goBack(){
@@ -156,11 +182,40 @@ protected:
   }
 
   void clear(){
-
+    if(startActionTime==0){
+      startActionTime=millis();
+      for(int i=0;i<54;i++){
+        cells[i]=i/9;
+      }
+      setOK();
+    }
+    if(millis()-startActionTime>OKTime){
+      actionEnd();
+    }
   }
 
   void randomBox(){
+    if(actions[0].action.surface>=0){
+      rotation();
+      return;
+    }
 
+    if(startActionTime==0){
+      randomSeed(analogRead(0));
+      startActionTime=millis();
+      for(int i=0;i<20;i++){
+        int t=random(18);
+        int side=(t/2%6);
+        if(t>15)
+          side=5;
+        addAction(MagicAction(RANDOM_BOX_CODE,0,0,Action(side,t%2,t/2>=6)));
+      }
+      setOK();
+    }
+
+    if(millis()-startActionTime>OKTime){
+      actionEnd();
+    }
   }
 
   void resetAll(){
@@ -179,10 +234,17 @@ public:
     actionIndex=0;
   }
   void setup(){
-    for(int i=0;i<6;i++){
-      for(int j=0;j<9;j++){
-        cells[i*9+j]=i;
+    if(rom.isNewone()){
+      cells=new byte[54];
+      for(int i=0;i<6;i++){
+        for(int j=0;j<9;j++){
+          cells[i*9+j]=i;
+        }
       }
+      rom.setNewone(false);
+      rom.setCell(cells);
+    }else{
+      cells=rom.getCell();
     }
     lastUpdate=millis();
   }
@@ -205,6 +267,7 @@ public:
       startActionTime=0;
       actionIndex--;
     }
+    rom.setCell(cells);
   }
 
   void getLed(){

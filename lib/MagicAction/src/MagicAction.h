@@ -17,10 +17,11 @@ public:
         this->action=action;
       }
     }
-    MagicAction(byte code=0,int arg1=0,int arg2=0){
+    MagicAction(byte code=0,int arg1=0,int arg2=0,Action action=Action()){
       this->code=code;
       this->arg1=arg1;
       this->arg2=arg2;
+      this->action=action;
     }
 };
 
