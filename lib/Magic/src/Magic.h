@@ -32,6 +32,10 @@ private:
     CRGB(0,0,0),CRGB(0,0,0),CRGB(0,0,0),CRGB(0,0,0)
   };
 
+  byte memNum=0;
+  byte* cellMem[5];
+  int memChoice=-1;
+
   byte maskRound=1;
   byte circlePS=3,middlePS=3,surfacePS=2;
   byte PS[3]={3,2,3};//依次为circle；surface；middle
@@ -45,7 +49,7 @@ private:
   unsigned long timePRotation=500;//每次转动的时间
   unsigned long timePRandom=200;
   unsigned long standbyTime=30000;//进入待机状态的时间
-  unsigned long OKTime=1000;//操作完成后动作
+  unsigned long OKTime=500;//操作完成后动作
   unsigned long showFaceTime=2000;
 
   unsigned long startActionTime=0;//开始执行操作时间；
@@ -80,6 +84,13 @@ protected:
     if(maski.r==0 && maski.g==0 && maski.b==0)
         return ledi;
     return maski;
+  }
+
+  void saveMem(){
+    rom.setMemNum(memNum);
+    for(int i=0;i<memNum;i++){
+      rom.setMem(cellMem[i],i);
+    }
   }
 
   void setOK(){
@@ -174,11 +185,42 @@ protected:
   }
 
   void goBack(){
+    if(startActionTime==0){
+      startActionTime=millis();
+      if(memNum>0)
+        memChoice++;
 
+      if(memChoice>=memNum){
+        memChoice=0;
+      }
+      setOK();
+    }
+    if(millis()-startActionTime>OKTime){
+      actionEnd();
+    }
   }
 
   void save(){
-
+    if(startActionTime==0){
+      startActionTime=millis();
+      memNum++;
+      if(memNum>5){
+        memNum=5;
+        delete(cellMem[4]);
+      }
+      for(int i=memNum;i>1;i--){
+        cellMem[i-1]=cellMem[i-2];
+      }
+      cellMem[0]=new byte[54];
+      for(int i=0;i<54;i++){
+        cellMem[0][i]=cells[i];
+      }
+      saveMem();
+      setOK();
+    }
+    if(millis()-startActionTime>OKTime){
+      actionEnd();
+    }
   }
 
   void clear(){
@@ -224,7 +266,7 @@ protected:
 
   void showDefault(){
     for(int i=0;i<54;i++){
-      led[i]=color[cells[i]];
+      led[i]=memChoice<0?color[cells[i]]:color[cellMem[memChoice][i]];
     }
   }
 
@@ -234,6 +276,7 @@ public:
     actionIndex=0;
   }
   void setup(){
+    rom.setNewone();
     if(rom.isNewone()){
       cells=new byte[54];
       for(int i=0;i<6;i++){
@@ -243,8 +286,14 @@ public:
       }
       rom.setNewone(false);
       rom.setCell(cells);
+      memNum=0;
+      saveMem();
     }else{
       cells=rom.getCell();
+      memNum=rom.getMemNum();
+      for(int i=0;i<memNum;i++){
+        cellMem[i]=rom.getMem(i);
+      }
     }
     lastUpdate=millis();
   }
@@ -254,8 +303,25 @@ public:
       lastUpdate=millis();
       return;
     }
-    if(action.code>0){
-      actions[actionIndex++]=action;
+    if(action.code<=0)
+      return;
+
+    actions[actionIndex++]=action;
+
+    if(memChoice>=0 && action.code!=GO_BACK_CODE){
+      for(int i=0;i<54;i++){
+        cells[i]=cellMem[memChoice][i];
+      }
+      delete(cellMem[memChoice]);
+      for(int i=memChoice;i>0;i--){
+        cellMem[i]=cellMem[i-1];
+      }
+      cellMem[0]=new byte[54];
+      for(int i=0;i<54;i++){
+        cellMem[0][i]=cells[i];
+      }
+      memChoice=-1;
+      saveMem();
     }
   }
 
@@ -266,8 +332,8 @@ public:
       }
       startActionTime=0;
       actionIndex--;
+      rom.setCell(cells);
     }
-    rom.setCell(cells);
   }
 
   void getLed(){
