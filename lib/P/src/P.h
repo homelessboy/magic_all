@@ -143,6 +143,7 @@ static byte actionSingle[6][4]={
 
 
 static int getSameSide(int index1,int index2){
+  int side=-1;
   for(int i=0;i<6;i++){
     int t=0;
     for(int j=0;j<12;j++){
@@ -151,13 +152,17 @@ static int getSameSide(int index1,int index2){
       if(CIRCLE[i][j].getIndex()==index2)
         t++;
     }
-    if(t==2)
-      return i;
+    if(t==2){
+      if(side!=-1)
+        return -1;
+      side=i;
+    }
   }
-  return -1;
+  return side;
 }
 
 static int getSameMiddle(int index1, int index2){
+  int side=-1;
   for(int i=0;i<6;i++){
     int t=0;
     for(int j=0;j<12;j++){
@@ -166,10 +171,13 @@ static int getSameMiddle(int index1, int index2){
       if(MIDDLE[i][j].getIndex()==index2)
         t++;
     }
-    if(t==2)
-      return i;
+    if(t==2){
+      if(side>=0)
+        return -1;
+      side=i;
+    }
   }
-  return -1;
+  return side;
 }
 
 static int getNumInCircle(int side,int index){

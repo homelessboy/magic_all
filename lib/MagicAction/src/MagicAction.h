@@ -24,11 +24,19 @@ public:
     }
 };
 
-static MagicAction GO_BACK=MagicAction(3);
-static MagicAction SAVE=MagicAction(4);
-static MagicAction CLEAR=MagicAction(5);
-static MagicAction RANDOM_BOX=MagicAction(6);
-static MagicAction RESET_ALL=MagicAction(7);
+static byte ROTATION_CODE=1;
+static byte SHOW_FACE_CODE=2;
+static byte GO_BACK_CODE=3;
+static byte SAVE_CODE=4;
+static byte CLEAR_CODE=5;
+static byte RANDOM_BOX_CODE=6;
+static byte RESET_ALL_CODE=7;
+
+static MagicAction GO_BACK=MagicAction(GO_BACK_CODE);
+static MagicAction SAVE=MagicAction(SAVE_CODE);
+static MagicAction CLEAR=MagicAction(CLEAR_CODE);
+static MagicAction RANDOM_BOX=MagicAction(RANDOM_BOX_CODE);
+static MagicAction RESET_ALL=MagicAction(RESET_ALL_CODE);
 
 /*
   code:

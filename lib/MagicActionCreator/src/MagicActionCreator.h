@@ -13,6 +13,9 @@ private:
   bool doubleSame=true,doubleDis=true,singleWay=true;
 
 protected:
+  void setup(){
+
+  }
   byte getNum(P p,int position=-1,int frontSide=-1){
     if(position<0)
       position=this->position;
@@ -65,7 +68,7 @@ protected:
     for(int i=0;i<6;i++){
       if(p.face==getSide(i)){
         int action=actionSingle[i][num/2];
-        ans = Action(getSide(action/2),action%2);
+        ans = Action(getSide(action/2),action%2==0);
       }
     }
 
@@ -111,7 +114,7 @@ protected:
       }
       if(d1==d2)
         return Action(-1);
-        return Action(side,d1<d2);
+      return Action(side,d1<d2);
     }else {
       side=getSameMiddle(index1, index2);
       if(side < 0) return Action(-1);
@@ -137,8 +140,8 @@ protected:
     Action ans=getActionSameWay(index1,index2);
     if(ans.surface<0){
       ans=getActionDisWay(index1,index2);
-      return MagicAction(ans);
     }
+    return MagicAction(ans);
   }
 
   MagicAction showFace(){

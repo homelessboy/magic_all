@@ -9,15 +9,17 @@
 class MagicBox:public Box{
 private:
   MagicActionCreator creator=MagicActionCreator();
-  Magic magic=Magic();
+  Magic magic=NULL;//=Magic();
   bool haveNewPush=false;
 public:
     MagicBox(CRGB *led,Keypad *kpd)
     :Box(led,kpd){
+      magic=Magic(led);
     }
 
     virtual void setup(){
       standByFlag=false;
+      magic.setup();
       // position=getPosition(0,4);
     }
 
@@ -50,7 +52,7 @@ public:
           }
         }
       }
-      magic.update();
+      // magic.update()
     }
 
     virtual void getLed(){
