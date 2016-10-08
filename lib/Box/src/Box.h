@@ -5,13 +5,13 @@
 #include "P.h"
 #include "FastLED.h"
 #include "Keypad.h"
+#include "SHOW.h"
 
 class Box{
 protected:
   Keypad *kpd;
   CRGB *led;
-  CRGB color[6]={CRGB(0,0,10),CRGB(0,10,0),CRGB(0,10,10),
-                  CRGB(10,0,0),CRGB(10,0,10),CRGB(10,10,0)};
+
   unsigned long standByT,lastUpdateT,wait4StandByT=30000;
   bool standByFlag=false;
 
@@ -41,6 +41,10 @@ public:
         // led[i*9+j]=color[(i+7)%6];
       }
     }
+  }
+
+  void display(SHOW *show,CRGB showColor=NULL){
+    (*show)(led,showColor);
   }
 
   void getLed(){}

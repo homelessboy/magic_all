@@ -6,6 +6,7 @@
 #include "PushBox.h"
 #include "RandomBox.h"
 #include "MagicBox.h"
+#include "BulbBox.h"
 
 #define LED_PIN     2
 #define COLOR_ORDER RGB
@@ -40,7 +41,8 @@ byte boxMap[54]={
 // LightBox box=LightBox(leds,&kpd);
 // PushBox box=PushBox(leds,&kpd,boxMap);
 // RandomBox box=RandomBox(leds,&kpd);
-MagicBox box=MagicBox(leds,&kpd);
+// MagicBox box=MagicBox(leds,&kpd);
+BulbBox box=BulbBox(leds,&kpd);
 unsigned long startTimeF;
 
 void setup() {
@@ -55,7 +57,7 @@ void loop() {
   box.update();
 
   //更新频率为 60FPS；
-  if((millis()-startTimeF)>1000/60){
+  if((millis()-startTimeF)>1000/30){
     if(box.isStandBy()){
       box.standBy();
     }else{

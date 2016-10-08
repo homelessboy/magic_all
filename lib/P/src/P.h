@@ -21,6 +21,11 @@ public:
         this->y = y;
         this->x = x;
     }
+    P(byte face,byte faceIndex){
+      this->face=face;
+      this->y=faceIndex/3;
+      this->x=faceIndex%3;
+    }
     P(byte index=0){
         this->face=index/9;
         this->y=(index%9)/3;
@@ -28,6 +33,9 @@ public:
     }
     byte getIndex() const {
         return face * 9 + y * 3 + x;
+    }
+    byte getXYIndex() const{
+      return y*3+x;
     }
     byte getNum() const{
       return NUM[y][x];
