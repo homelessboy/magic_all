@@ -6,12 +6,13 @@
 
 CRGB color[6]={CRGB(0,0,10),CRGB(0,10,0),CRGB(0,10,10),
                 CRGB(10,0,0),CRGB(10,0,10),CRGB(10,10,0)};
+CRGB rainbow12[12];
 
 unsigned long farmIndex=0;
 
 typedef void (SHOW)(CRGB *led,CRGB choice);
 
-static byte SHOW_NUM=4;
+static byte SHOW_NUM=5;
 
 void setColor(CRGB *led,CRGB color=CRGB(0,0,0)){
   for(int i=0;i<54;i++)
@@ -65,6 +66,31 @@ void show4(CRGB *led,CRGB choice){
       led[CIRCLE[4][(12-(i+2+farmIndex)%12)%12].getIndex()]=choice;
 
     }
+  }
+  farmIndex++;
+}
+
+//彩虹圈
+void show5(CRGB *led,CRGB choice){
+  fill_rainbow(rainbow12, 12, 0,12);
+  int v=rgb2hsv_approximate(choice).v;
+  unsigned long index=farmIndex;
+  for(int i=0;i<12;i++){
+    led[CIRCLE[5][(i+index)%12].getIndex()]=rainbow12[i];
+    led[MIDDLE[5][(i+9+index)%12].getIndex()]=rainbow12[i];
+    led[CIRCLE[4][(12-(i+index-2)%12)%12].getIndex()]=rainbow12[i];
+  }
+
+  for(int i=0;i<8;i++){
+    led[SURFACE[5][(i+4)%8].getIndex()]=led[CIRCLE[5][i*3/2].getIndex()];
+    led[SURFACE[4][(18-i%8)%8].getIndex()]=led[CIRCLE[5][i*3/2].getIndex()];
+  }
+  led[P(5,1,1).getIndex()]=choice;
+  led[P(4,1,1).getIndex()]=choice;
+
+  for(int i=0;i<54;i++){
+    CHSV tmp=rgb2hsv_approximate(led[i]);
+    led[i]=CHSV(tmp.h,tmp.s,v);
   }
   farmIndex++;
 }

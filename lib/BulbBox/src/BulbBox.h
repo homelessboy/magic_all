@@ -78,10 +78,8 @@ public:
     }
     lastUpdateT=millis();
     if(keyNum<=2){
-      int incValue=1;
       int opIndex=0;
       if(keyNum==2){
-        incValue=-1;
         if(P(keys[0]).getNum()==8){
           opIndex=1;
         }else if(P(keys[0]).getNum()==8){
@@ -97,7 +95,12 @@ public:
           }
           break;
         case 1:
-          showColor.g+=incValue;
+          if(keyNum==1&&showColor.g<255){
+            showColor.g++;
+          }
+          if(keyNum==2&&showColor.g>0){
+            showColor.g--;
+          }
           break;
         case 2:
           if(keyNum==1){
@@ -107,7 +110,12 @@ public:
           }
           break;
         case 3:
-          showColor.b+=incValue;
+          if(keyNum==1 && showColor.b<255){
+            showColor.b++;
+          }
+          if(keyNum==2 && showColor.b>0){
+            showColor.b--;
+          }
           break;
         case 4:{
             if(keyNum>1)
@@ -136,7 +144,12 @@ public:
           }
           break;
         case 7:
-          showColor.r+=incValue;
+          if(keyNum==1 && showColor.r<255){
+            showColor.r++;
+          }
+          if(keyNum==2 && showColor.r>0){
+            showColor.r--;
+          }
           break;
         default:
           break;
@@ -145,7 +158,6 @@ public:
   }
 
   virtual void getLed(){
-    int a=1,b=2;
     switch (showIndex) {
       case 0:
         display(show1,showColor);
@@ -159,6 +171,8 @@ public:
       case 3:
         display(show4,showColor);
         break;
+      case 4:
+        display(show5,showColor);
       default:
         break;
     };

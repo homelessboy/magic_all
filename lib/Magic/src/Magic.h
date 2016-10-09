@@ -84,7 +84,7 @@ protected:
     if(maskRound==0)
       return ledi;
     if(maski.r==0 && maski.g==0 && maski.b==0)
-        return ledi;
+      return ledi;
     return maski;
   }
 
@@ -117,7 +117,9 @@ protected:
       operatSide=actions[0].action.surface;
     }
     unsigned long timeP=actions[0].code==ROTATION_CODE?timePRotation:timePRandom;
-
+    if(actions[0].code==ROTATION_CODE&& actionIndex>1){
+      timeP=20;
+    }
     unsigned long nowTime=millis();
     if(startActionTime!=0){
       for(int i=0;i<3;i++){
