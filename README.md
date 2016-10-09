@@ -18,5 +18,8 @@
 
   * L U' R' U L' U' R
 
+#### 顶层角交换
+  * R UU R' U' R UU L' U R' U' L
+
 #### 顶层中间归位
-  * R U'R U R U R U' R' U' R R
+  * (R U' R) (U R U R) (U' R' U') (R R)

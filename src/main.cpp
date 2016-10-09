@@ -41,8 +41,8 @@ byte boxMap[54]={
 // LightBox box=LightBox(leds,&kpd);
 // PushBox box=PushBox(leds,&kpd,boxMap);
 // RandomBox box=RandomBox(leds,&kpd);
-// MagicBox box=MagicBox(leds,&kpd);
-BulbBox box=BulbBox(leds,&kpd);
+MagicBox box=MagicBox(leds,&kpd);
+// BulbBox box=BulbBox(leds,&kpd);
 unsigned long startTimeF;
 
 void setup() {
