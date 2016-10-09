@@ -31,8 +31,6 @@ public:
   virtual void setup(){
     startTime=millis();
     standByFlag=true;
-    Serial.println(rgb2hsv_approximate(CRGB(10,0,0)).v);
-
   }
 
   virtual bool isStandBy(){
@@ -118,7 +116,6 @@ public:
             if(showIndex>=SHOW_NUM)
               showIndex=0;
             removeKey(keys[0]);
-            Serial.println(showIndex);
           }
           break;
         case 5:{
@@ -130,12 +127,12 @@ public:
         case 6:{
             if(keyNum>1)
               break;
-            showIndex--;
-            if(showIndex<0)
+            if(showIndex==0){
               showIndex=SHOW_NUM-1;
-
+            }else{
+              showIndex--;
+            }
             removeKey(keys[0]);
-            Serial.println(showIndex);
           }
           break;
         case 7:
